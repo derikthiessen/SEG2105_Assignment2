@@ -259,6 +259,8 @@ public abstract class AbstractClient implements Runnable {
 	 * attempting to reconnect.
 	 */
 	protected void connectionClosed() {
+		System.out.println("Connection closed: server has shut down.");
+		System.exit(0);
 	}
 
 	/**
@@ -270,6 +272,9 @@ public abstract class AbstractClient implements Runnable {
 	 *            the exception raised.
 	 */
 	protected void connectionException(Exception exception) {
+		System.out.println("Connection error: server has shut down or an exception occured when connecting.");
+		System.out.println(exception.getMessage());
+		System.exit(0);
 	}
 
 	/**
