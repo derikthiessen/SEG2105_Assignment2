@@ -72,27 +72,110 @@ public class ClientConsole implements ChatIF
   
   //Instance methods ************************************************
   
-  /**
-   * This method waits for input from the console.  Once it is 
-   * received, it sends it to the client's message handler.
-   */
-  public void accept() 
+/**
+ * This method waits for input from the console.  Once it is 
+ * received, it sends it to the client's message handler.
+ */
+public void accept() 
+{
+  try
   {
-    try
+    String message;
+
+    while (true) 
     {
-
-      String message;
-
-      while (true) 
-      {
-        message = fromConsole.nextLine();
+      message = fromConsole.nextLine();
+      if (message.startsWith("#")) {
+        handleCommand(message.substring(1).trim());
+      } else {
         client.handleMessageFromClientUI(message);
       }
-    } 
-    catch (Exception ex) 
-    {
-      System.out.println
-        ("Unexpected error while reading from console!");
+    }
+  } 
+  catch (Exception ex) 
+  {
+    System.out.println
+      ("Unexpected error while reading from console!");
+  }
+}
+
+/**
+ * Handles commands entered by the user that start with '#'.
+ * @param command The command string without the leading '#'.
+ */
+private void handleCommand(String command) {
+    String[] tokens = command.split("\\s+");
+    String cmd = tokens[0].toLowerCase();
+
+    switch (cmd) {
+      case "quit":
+        try {
+          client.closeConnection();
+        } catch (Exception e) {}
+        System.exit(0);
+        break;
+
+      case "logoff":
+        try {
+          client.closeConnection();
+          System.out.println("Logged off from server.");
+        } catch (Exception e) {
+          System.out.println("Error logging off: " + e.getMessage());
+        }
+        break;
+
+      case "sethost":
+        if (client.isConnected()) {
+          System.out.println("You must log off before changing the host.");
+        } else if (tokens.length > 1) {
+          client.setHost(tokens[1]);
+          System.out.println("Host set to: " + tokens[1]);
+        } else {
+          System.out.println("Usage: #sethost <host>");
+        }
+        break;
+
+      case "setport":
+        if (client.isConnected()) {
+          System.out.println("You must log off before changing the port.");
+        } else if (tokens.length > 1) {
+          try {
+            int port = Integer.parseInt(tokens[1]);
+            client.setPort(port);
+            System.out.println("Port set to: " + port);
+          } catch (NumberFormatException e) {
+            System.out.println("Invalid port number. Usage: #setport <port>");
+          }
+        } else {
+          System.out.println("Usage: #setport <port>");
+        }
+        break;
+
+      case "login":
+        if (client.isConnected()) {
+          System.out.println("You are already logged in.");
+        } else {
+          try {
+            client.openConnection();
+            System.out.println("Logged in to server at " + client.getHost() + ":" + client.getPort());
+          } catch (Exception e) {
+            System.out.println("Error logging in: " + e.getMessage());
+          }
+        }
+        break;
+
+      case "gethost":
+        System.out.println("Current host: " + client.getHost());
+        break;
+
+      case "getport":
+        System.out.println("Current port: " + client.getPort());
+        break;
+
+      default:
+        System.out.println("Unknown command: #" + cmd);
+        System.out.println("Available commands: #quit, #logoff, #sethost <host>, #setport <port>, #login, #gethost, #getport");
+        break;
     }
   }
 
