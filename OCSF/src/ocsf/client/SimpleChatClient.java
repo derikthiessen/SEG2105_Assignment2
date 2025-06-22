@@ -1,6 +1,7 @@
 package ocsf.client;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class SimpleChatClient extends AbstractClient {
     
@@ -32,6 +33,91 @@ public class SimpleChatClient extends AbstractClient {
 		System.exit(0);
     }
 
+    private boolean handleCommand(String command, SimpleChatClient client) {
+        String[] commands = command.split(" ");
+
+        switch (commands[0]) {
+            case "quit":
+                try {
+                    client.closeConnection();
+                } catch (IOException e) {
+                    System.out.println("Error closing connection: " + e.getMessage());
+                }
+
+                return false;
+
+            case "logoff":
+                try {
+                    client.closeConnection();
+                } catch (IOException e) {
+                    System.out.println("Error logging off: " + e.getMessage());
+                }
+
+                return true;
+
+            case "sethost":
+                if (client.isConnected()) {
+                    System.out.println("You must log off before changing the host.");
+                } else {
+                    if (commands.length > 1) {
+                        client.setHost(commands[1]);
+                        System.out.println("Host set to: " + commands[1]);
+                    } else {
+                        System.out.println("Usage: #sethost <hostname>");
+                    }
+                }
+
+                return true;
+
+            case "setport":
+                
+                if (client.isConnected()) {
+                    System.out.println("You must log off before changing the port.");
+                } else {
+                    if (commands.length > 1) {
+                        try {
+                            int port = Integer.parseInt(commands[1]);
+                            client.setPort(port);
+                            System.out.println("Port set to: " + port);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid port number. Usage: #setport <port>");
+                        }
+                    } else {
+                        System.out.println("Usage: #setport <port>");
+                    }
+                }
+
+                return true;
+
+            case "login":
+                if (client.isConnected()) {
+                    System.out.println("You are already logged in.");
+                } else {
+                    try {
+                        client.openConnection();
+                        System.out.println("Logged in to server at " + client.getHost() + ":" + client.getPort());
+                    } catch (IOException e) {
+                        System.out.println("Error logging in: " + e.getMessage());
+                    }
+                }
+
+                return true;
+
+            case "gethost":
+                System.out.println("Current host: " + client.getHost());
+                return true;
+            
+            case "getport":
+                System.out.println("Current port: " + client.getPort());
+                return true;
+            
+            default:
+                System.out.println("Unknown command: " + commands[0]);
+                System.out.println("Available commands: quit, logoff, sethost, setport, login, gethost, getport");
+                return true;
+        }
+    }
+
     public static void main(String[] args) {
         String host = "defaulthost";
         int port = 5555;
@@ -55,5 +141,24 @@ public class SimpleChatClient extends AbstractClient {
             System.out.println("Could not connect to server at " + host + ":" + port);
             System.exit(1);
         }
+
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+
+        while (running) {
+            String input = scanner.nextLine();
+            if (input.startsWith("#")) {
+                running = client.handleCommand(input.substring(1).toLowerCase().trim(), client);
+            }
+            else {
+                try {
+                    client.sendToServer(input);
+                } catch (IOException e) {
+                    System.out.println("Error sending message to server: " + e.getMessage());
+                }
+            }
+        }
+
+        scanner.close();
     }
 }
