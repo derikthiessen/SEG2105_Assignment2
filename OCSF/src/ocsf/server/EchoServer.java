@@ -78,8 +78,8 @@ public class EchoServer extends AbstractServer
 
     // Prefix message with login id
     String loginId = (String) client.getInfo("loginId");
+    System.out.println("Message received: " + message + " from " + loginId);
     String echoMsg = loginId + ": " + message;
-    System.out.println("Message received: " + echoMsg + " from " + loginId);
     this.sendToAllClients(echoMsg);
   }
     
