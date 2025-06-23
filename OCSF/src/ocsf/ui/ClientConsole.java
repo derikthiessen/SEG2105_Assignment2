@@ -201,7 +201,7 @@ private void handleCommand(String command) {
 public static void main(String[] args) 
   {
     if (args.length < 1) {
-      System.out.println("ERROR: Login ID is required as the first argument.");
+      System.out.println("ERROR - No login ID specified. Connection aborted.");
       System.exit(1);
     }
     String loginId = args[0];
