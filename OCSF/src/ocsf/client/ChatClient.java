@@ -31,6 +31,8 @@ public class ChatClient extends AbstractClient
    */
   String loginId;
 
+  private boolean isQuitting = false;
+
   //Constructors ****************************************************
   
   /**
@@ -89,6 +91,7 @@ public class ChatClient extends AbstractClient
    */
   public void quit()
   {
+    isQuitting = true;
     try
     {
       closeConnection();
@@ -110,7 +113,10 @@ public class ChatClient extends AbstractClient
   @Override
   protected void connectionClosed() {
     clientUI.display("Connection to server closed");
-    System.exit(0);
+    if (isQuitting) {
+      System.exit(0);
+    }
+    
   }
 
   @Override
