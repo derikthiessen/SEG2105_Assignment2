@@ -100,7 +100,7 @@ public class EchoServer extends AbstractServer
   
   @Override
   protected void clientConnected(ConnectionToClient client) {
-    System.out.println("Client connected: " + client);
+    System.out.println("A new client has connected to the server.");
   }
 
   @Override
