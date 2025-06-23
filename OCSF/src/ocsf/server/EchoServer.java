@@ -55,6 +55,9 @@ public class EchoServer extends AbstractServer
         String loginId = message.substring(7).trim();
         client.setInfo("loginId", loginId);
         System.out.println(loginId + " has logged on.");
+        try {
+          client.sendToClient(loginId + " has logged on.");
+        } catch (Exception e) {}
       } else {
         try {
           client.sendToClient("ERROR: Already logged in. Connection will be closed.");
