@@ -71,7 +71,6 @@ public class ServerConsole implements ChatIF
       case "stop":
         try {
           server.stopListening();
-          System.out.println("Server stopped listening for new clients.");
         } catch (Exception e) {
           System.out.println("Error stopping server: " + e.getMessage());
         }
