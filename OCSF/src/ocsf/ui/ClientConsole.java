@@ -50,11 +50,11 @@ public class ClientConsole implements ChatIF
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
-  public ClientConsole(String host, int port) 
+  public ClientConsole(String loginId, String host, int port) 
   {
     try 
     {
-      client= new ChatClient(host, port, this);
+      client= new ChatClient(loginId, host, port, this);
       
       
     } 
@@ -198,35 +198,29 @@ private void handleCommand(String command) {
    *
    * @param args[0] The host to connect to.
    */
-  public static void main(String[] args) 
+public static void main(String[] args) 
   {
-    String host = "";
+    if (args.length < 1) {
+      System.out.println("ERROR: Login ID is required as the first argument.");
+      System.exit(1);
+    }
+    String loginId = args[0];
+    String host = "localhost";
     int port = DEFAULT_PORT;
 
-    try
-    {
-      host = args[0];
+    if (args.length > 1) {
+      host = args[1];
     }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
-      host = "localhost";
+    if (args.length > 2) {
+      try {
+        port = Integer.parseInt(args[2]);
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid port number. Using default port " + DEFAULT_PORT);
+        port = DEFAULT_PORT;
+      }
     }
 
-    try 
-    {
-      port = Integer.parseInt(args[1]);
-    }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
-      port = DEFAULT_PORT;
-    }
-    catch(NumberFormatException e)
-    {
-      System.out.println("Invalid port number. Using default port " + DEFAULT_PORT);
-      port = DEFAULT_PORT;
-    }
-    
-    ClientConsole chat = new ClientConsole(host, port);
+    ClientConsole chat = new ClientConsole(loginId, host, port);
     chat.accept();  //Wait for console data
   }
 }
