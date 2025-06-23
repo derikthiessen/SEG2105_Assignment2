@@ -42,11 +42,40 @@ public class EchoServer extends AbstractServer
    * @param msg The message received from the client.
    * @param client The connection from which the message originated.
    */
-  public void handleMessageFromClient
-    (Object msg, ConnectionToClient client)
+  public void handleMessageFromClient(Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+    String message = msg.toString();
+
+    // Check for #login command
+    if (message.startsWith("#login ")) {
+      // Only allow if login id not already set
+      if (client.getInfo("loginId") == null) {
+        String loginId = message.substring(7).trim();
+        client.setInfo("loginId", loginId);
+        System.out.println("Client logged in with ID: " + loginId);
+      } else {
+        try {
+          client.sendToClient("ERROR: Already logged in. Connection will be closed.");
+          client.close();
+        } catch (Exception e) {}
+      }
+      return;
+    }
+
+    // If client not logged in, reject any other message
+    if (client.getInfo("loginId") == null) {
+      try {
+        client.sendToClient("ERROR: You must login first. Connection will be closed.");
+        client.close();
+      } catch (Exception e) {}
+      return;
+    }
+
+    // Prefix message with login id
+    String loginId = (String) client.getInfo("loginId");
+    String echoMsg = loginId + ": " + message;
+    System.out.println("Message received: " + echoMsg + " from " + client);
+    this.sendToAllClients(echoMsg);
   }
     
   /**
