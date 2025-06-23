@@ -110,7 +110,12 @@ public class EchoServer extends AbstractServer
 
   @Override
   protected void clientDisconnected(ConnectionToClient client) {
-    System.out.println("Client disconnected: " + client);
+    Object loginId = client.getInfo("loginId");
+    if (loginId != null) {
+      System.out.println(loginId + " has disconnected.");
+    } else {
+      System.out.println("An anonymous client has disconnected.");
+    }
   }
   
   //Class methods ***************************************************
