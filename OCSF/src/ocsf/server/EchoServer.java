@@ -48,11 +48,13 @@ public class EchoServer extends AbstractServer
 
     // Check for #login command
     if (message.startsWith("#login ")) {
+      // Print message received from null (before loginId is set)
+      System.out.println("Message received: " + message + " from " + client.getInfo("loginId"));
       // Only allow if login id not already set
       if (client.getInfo("loginId") == null) {
         String loginId = message.substring(7).trim();
         client.setInfo("loginId", loginId);
-        System.out.println("Client logged in with ID: " + loginId);
+        System.out.println(loginId + " has logged on.");
       } else {
         try {
           client.sendToClient("ERROR: Already logged in. Connection will be closed.");
@@ -74,7 +76,7 @@ public class EchoServer extends AbstractServer
     // Prefix message with login id
     String loginId = (String) client.getInfo("loginId");
     String echoMsg = loginId + ": " + message;
-    System.out.println("Message received: " + echoMsg + " from " + client);
+    System.out.println("Message received: " + echoMsg + " from " + loginId);
     this.sendToAllClients(echoMsg);
   }
     
